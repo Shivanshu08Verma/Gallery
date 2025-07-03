@@ -30,25 +30,38 @@ export default function UploadImages({ data, setData, setDatas }) {
   };
   const handleUpload = (e) => {
     e.preventDefault();
-
+    console.log(inputValue);
+    const seen = new Set();
     const leftoverTags = inputValue
       .split(/[,\s]+/)
       .map((tag) => tag.trim())
       .filter(
         (tag) =>
-          tag &&
-          !data.tags.some(
-            (existing) => existing.toLowerCase() === tag.toLowerCase()
-          )
+          tag && !seen.has(tag.toLowerCase()) && seen.add(tag.toLowerCase())
       );
-
-    const allTags = [...data.tags, ...leftoverTags];
-    const finalData = {
+    // setInputValue("");
+    // if (fileName.length === 0) {
+    //   setData({ src: "", tags: [...data.tags] });
+    // }
+    console.log(leftoverTags);
+    const allTags = [...leftoverTags];
+    console.log(allTags);
+    let finalData = {
       ...data,
       tags: allTags,
     };
+    if (fileName.length === 0) {
+      finalData = { src: "", tags: [...finalData.tags] };
+    }
+    console.log(finalData);
     const validateResult = valid(finalData);
-    if (Object.keys(validateResult).length) return;
+    if (Object.keys(validateResult).length) {
+      // allTags = [];
+      // finalData.src = "";
+      console.log("hello");
+      // setData((gg) => [...gg, { tags: [] }]);
+      return;
+    }
     setDatas((prev) => [...prev, { ...finalData, id: crypto.randomUUID() }]);
     setData({ src: "", tags: [] });
     setFileName("");
@@ -102,10 +115,11 @@ export default function UploadImages({ data, setData, setDatas }) {
               value={inputValue}
               onChange={(e) => {
                 const value = e.target.value;
+                // console.log(value);
                 setInputValue(value);
                 const lastChar = value[value.length - 1];
                 if (lastChar === " " || lastChar === ",") {
-                  const tag = value.slice(0, -1).trim(); 
+                  const tag = value.slice(0, -1).trim();
 
                   if (
                     tag &&
